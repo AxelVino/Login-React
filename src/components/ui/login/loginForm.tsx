@@ -1,0 +1,122 @@
+"use client";
+import { Button } from "@/components/ui/button/button.tsx";
+import { Input } from "@/components/ui/input/input.tsx";
+import { CardTitle } from "../card/card.tsx";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form/form.tsx";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Checkbox } from "../checkbox/checkbox.tsx";
+import { useState } from "react";
+import { postLoggin } from "../../api/logginService.tsx";
+
+const formSchema = z.object({
+  email: z.string().email({ message: "Invalid email address" }),
+  password: z.string().min(8, { message: "Incorrect password" }),
+});
+
+export default function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+  const [_error, setError] = useState("");
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      email: "",
+      password: "",
+    },
+  });
+
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    setError("");
+    try {
+      const { token, username } = await postLoggin(
+        values.email,
+        values.password
+      );
+      localStorage.setItem("token", token);
+      console.log("Usuario logueado:", username);
+
+      window.location.href = "/home";
+    } catch (err: any) {
+      if (err.response?.status === 400) {
+        setError("¡Incorrect email or password!");
+      } else {
+        setError("Error al iniciar sesión.");
+      }
+    }
+  };
+  return (
+    <Form {...form}>
+      <CardTitle className="text-5xl font-bold m-3 px-10">WELCOME </CardTitle>
+      <form
+        onSubmit={form.handleSubmit(onSubmit)}
+        className="space-y-8 flex flex-col justify-center "
+      >
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem className="m-1">
+              <FormLabel>Email</FormLabel>
+              <FormControl>
+                <Input
+                  placeholder="example@email.com"
+                  required={true}
+                  {...field}
+                />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem className="m-1">
+              <FormLabel>Password</FormLabel>
+              <FormControl>
+                <Input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="********"
+                  required={true}
+                  {...field}
+                />
+              </FormControl>
+              <div className="flex flex-row items-center gap-1 mb-4">
+                <Checkbox
+                  className="cursor-pointer"
+                  onClick={() => setShowPassword(!showPassword)}
+                ></Checkbox>
+                <span>Show password</span>
+              </div>
+              <FormMessage
+                className="mt-0 mb-7 justify-center"
+                style={{
+                  color: "var(--error-color)",
+                }}
+              >
+                {_error}
+              </FormMessage>
+            </FormItem>
+          )}
+        />
+        <div className="flex flex-col justify-center items-center">
+          <Button className="m-0 px-20 cursor-pointer" type="submit">
+            Log in
+          </Button>
+          <span className="m-2">
+            <a href="">Create account</a>
+          </span>
+        </div>
+      </form>
+    </Form>
+  );
+}
