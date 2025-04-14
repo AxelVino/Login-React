@@ -1,16 +1,27 @@
-import { JSX } from "react";
+import { JSX, useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
+import { tokenAuth } from "../api/authService";
+import Loader from "../ui/loader/loader";
 
 export default function ProtectedRoute({
   children,
 }: {
   children: JSX.Element;
 }) {
-  const token = localStorage.getItem("token");
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
-  if (!token) {
-    return <Navigate to="/login" replace />;
+  useEffect(() => {
+    const validate = async () => {
+      const res = await tokenAuth();
+      setIsAuthorized(!!res);
+    };
+
+    validate();
+  }, []);
+
+  if (isAuthorized === null) {
+    return <Loader />;
   }
 
-  return children;
+  return isAuthorized ? children : <Navigate to="/login" replace />;
 }

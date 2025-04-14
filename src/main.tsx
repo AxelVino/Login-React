@@ -5,9 +5,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DefaultRedirect from "./components/security/defaultRedirect.tsx";
 
 //rutas
-import Login from "./routes/login.tsx";
 import Layout from "./components/ui/layout/index.tsx";
 import ProtectedRoute from "./components/security/protectedRoute.tsx";
+import LoginWrapper from "./components/wrapper/loginWrapper.tsx";
 
 const router = createBrowserRouter([
   {
@@ -19,7 +19,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/login",
-        element: <Login />,
+        element: <LoginWrapper />,
       },
       {
         path: "/home",

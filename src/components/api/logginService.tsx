@@ -6,10 +6,16 @@ export const postLoggin = async (
   email: string,
   password: string
 ): Promise<LoginResponse> => {
-  const res = await axios.post<LoginResponse>(`${API_URL}/api/v1/auth/login`, {
-    email,
-    password,
-  });
+  const res = await axios.post<LoginResponse>(
+    `${API_URL}/api/v1/auth/login`,
+    {
+      email,
+      password,
+    },
+    {
+      withCredentials: true,
+    }
+  );
   return res.data;
 };
 

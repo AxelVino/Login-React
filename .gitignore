@@ -12,15 +12,21 @@ dist
 dist-ssr
 *.local
 .env
+tsconfig.node.json
+.eslintcache
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
+Thumbs.db
+
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
+
+coverage/

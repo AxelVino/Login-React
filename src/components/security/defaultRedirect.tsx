@@ -7,12 +7,8 @@ export default function DefaultRedirect() {
   const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
   useEffect(() => {
     const validateToken = async () => {
-      try {
-        const res = await tokenAuth();
-        if (res) setIsAuthorized(true);
-      } catch (err) {
-        setIsAuthorized(false);
-      }
+      const res = await tokenAuth();
+      setIsAuthorized(!!res);
     };
     validateToken();
   }, []);

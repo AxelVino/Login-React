@@ -14,8 +14,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Checkbox } from "../checkbox/checkbox.tsx";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { postLoggin } from "../../api/logginService.tsx";
+import { tokenAuth } from "@/components/api/authService.tsx";
+import { Navigate, useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -25,6 +27,7 @@ const formSchema = z.object({
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [_error, setError] = useState("");
+  const navigate = useNavigate();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,22 +37,31 @@ export default function LoginForm() {
     },
   });
 
+  useEffect(() => {
+    const checkAuth = async () => {
+      const user = await tokenAuth();
+      if (user) {
+        navigate("/home", { replace: true });
+      }
+    };
+    checkAuth();
+  }, []);
+
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setError("");
     try {
-      const { token, username } = await postLoggin(
-        values.email,
-        values.password
-      );
-      localStorage.setItem("token", token);
-      console.log("Usuario logueado:", username);
+      const { username } = await postLoggin(values.email, values.password);
 
-      window.location.href = "/home";
+      if (username) {
+        navigate("/home", { replace: true });
+      } else {
+        setError("¡Invalid server response!");
+      }
     } catch (err: any) {
       if (err.response?.status === 400) {
         setError("¡Incorrect email or password!");
       } else {
-        setError("Error al iniciar sesión.");
+        setError("¡Login failed!");
       }
     }
   };
