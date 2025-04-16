@@ -17,7 +17,7 @@ import { Checkbox } from "../checkbox/checkbox.tsx";
 import { useEffect, useState } from "react";
 import { postLoggin } from "../../api/logginService.tsx";
 import { tokenAuth } from "@/components/api/authService.tsx";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address" }),
@@ -81,6 +81,7 @@ export default function LoginForm() {
               <FormControl>
                 <Input
                   placeholder="example@email.com"
+                  autoComplete="username"
                   required={true}
                   {...field}
                 />
@@ -97,6 +98,7 @@ export default function LoginForm() {
               <FormControl>
                 <Input
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   placeholder="********"
                   required={true}
                   {...field}
@@ -105,6 +107,8 @@ export default function LoginForm() {
               <div className="flex flex-row items-center gap-1 mb-4">
                 <Checkbox
                   className="cursor-pointer"
+                  id="checkbox"
+                  name="checkbox"
                   onClick={() => setShowPassword(!showPassword)}
                 ></Checkbox>
                 <span>Show password</span>
